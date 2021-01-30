@@ -17,7 +17,28 @@ public class Book {
   private String notes;
   private float price;
   private boolean available;
+  private boolean funny;
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Book book = (Book) o;
+    return id == book.id && Float.compare(book.price, price) == 0 && available == book.available && funny == book.funny && Objects.equals(title, book.title) && Objects.equals(author, book.author) && Objects.equals(genre, book.genre) && Objects.equals(notes, book.notes);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, title, author, genre, notes, price, available, funny);
+  }
+
+  public boolean isFunny() {
+    return funny;
+  }
+
+  public void setFunny(boolean funny) {
+    this.funny = funny;
+  }
 
   public long getId() {
     return id;
@@ -75,23 +96,4 @@ public class Book {
     this.available = available;
   }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    Book book = (Book) o;
-    return id == book.id && Float.compare(book.price, price) == 0
-        && available == book.available && Objects.equals(title, book.title)
-        && Objects.equals(author, book.author) && Objects
-        .equals(genre, book.genre) && Objects.equals(notes, book.notes);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(id, title, author, genre, notes, price, available);
-  }
 }
