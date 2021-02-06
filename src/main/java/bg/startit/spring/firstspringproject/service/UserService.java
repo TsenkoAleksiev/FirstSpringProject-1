@@ -2,6 +2,10 @@ package bg.startit.spring.firstspringproject.service;
 
 import bg.startit.spring.firstspringproject.model.User;
 import bg.startit.spring.firstspringproject.repository.UserRepository;
+import java.time.OffsetDateTime;
+import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -26,12 +30,50 @@ public class UserService implements UserDetailsService {
   public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
     // create admin user
     if (userRepository.count() == 0) {
-      User user = new User();
-      user.setUsername("admin");
-      user.setPassword(passwordEncoder.encode("admin"));
-      userRepository.save(user);
+      register("admin", "admin","admin");
     }
-    return userRepository.findByUsername(s)
-        .orElseThrow(() -> new UsernameNotFoundException("Not Found."));
+    Optional<User> user = userRepository.findByUsername(s);
+    if (!user.isPresent()) {
+      throw new UsernameNotFoundException("Not Found.");
+    }
+    User realUser = user.get();
+    realUser.setLastLoginTime(OffsetDateTime.now());
+    return userRepository.save(realUser);
+
   }
+
+  public Page<User> listUsers(Pageable pageable) {
+    return userRepository.findAll(pageable);
+  }
+
+  public User changePassword(User user, String oldPassword, String newPassword) {
+    //validate old password
+    String currentPassHash = user.getPassword();
+    if (!passwordEncoder.matches(oldPassword, currentPassHash)) {
+      throw new IllegalArgumentException("The password doesn't match");
+    }
+    if (passwordEncoder.matches(newPassword, currentPassHash)) {
+      throw new IllegalArgumentException("The passwords are the same");
+    }
+    //set new password and save
+    user.setPassword(passwordEncoder.encode(newPassword));
+    return userRepository.save(user);
+  }
+
+  public User register(String userName, String userPassword, String passConfirmation) {
+    if (!userPassword.equals(passConfirmation)) {
+      throw new IllegalArgumentException("The passwords doesn't match");
+    }
+    if (userRepository.findByUsername(userName).isPresent()) {
+      throw new IllegalArgumentException("The username already exist");
+    }
+    User user = new User();
+    user.setUsername(userName);
+    user.setPassword(passwordEncoder.encode(userPassword));
+    user.setRegistrationTime(OffsetDateTime.now());
+    return userRepository.save(user);
+  }
+  // which books were borrowed
+  // roles security
+
 }

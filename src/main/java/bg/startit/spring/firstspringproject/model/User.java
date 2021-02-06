@@ -1,5 +1,6 @@
 package bg.startit.spring.firstspringproject.model;
 
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
@@ -30,13 +31,35 @@ public class User implements UserDetails {
   @NotNull
   @Size(max = 1024)
   private String password;      //password hash
+  private OffsetDateTime lastLoginTime;
+  @NotNull
+  private OffsetDateTime registrationTime;
 
   public long getId() {
     return id;
   }
 
-  public void setId(long id) {
+  public User setId(long id) {
     this.id = id;
+    return this;
+  }
+
+  public OffsetDateTime getLastLoginTime() {
+    return lastLoginTime;
+  }
+
+  public User setLastLoginTime(OffsetDateTime lastLoginTime) {
+    this.lastLoginTime = lastLoginTime;
+    return this;
+  }
+
+  public OffsetDateTime getRegistrationTime() {
+    return registrationTime;
+  }
+
+  public User setRegistrationTime(OffsetDateTime registrationTime) {
+    this.registrationTime = registrationTime;
+    return this;
   }
 
   public String getUsername() {
