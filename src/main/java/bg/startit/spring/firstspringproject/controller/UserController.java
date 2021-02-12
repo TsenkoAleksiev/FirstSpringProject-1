@@ -9,9 +9,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -61,17 +60,18 @@ public class UserController {
     return userService.changePassword(userID, request.getOldPassword(), request.getNewPassword());
   }
 
-//  @PostMapping("current")
-//  public  User updateCurrentPassword(ChangePasswordRequest request, @AuthenticationPrincipal
-//      org.springframework.security.core.userdetails.UserDetails user){
-////    Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-////    User user = (User) authentication.getPrincipal(); // can be cast to User
-//    return userService.changePassword((User)user, request.getOldPassword(),request.getNewPassword());
-// }
-  // user
-  // change password -> POST /api/v1/users/10
-  // why 10?
-  // change password -> POST /api/v1/users/current ?
+  // change password of the current user -> POST /api/v1/users/current ?
+  @PostMapping("/current")
+  public User updateCurrentUserPassword(ChangePasswordRequest request,
+      @AuthenticationPrincipal UserDetails user) {
+    // alternatively to injecting the @AuthenticationPrincipal above, you can use the
+    // construction below:
+//    Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+//    User user = (User) authentication.getPrincipal(); // can be cast to User
+
+    return userService
+        .changePassword((User) user, request.getOldPassword(), request.getNewPassword());
+  }
 
 
 }
